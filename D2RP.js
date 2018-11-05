@@ -1,47 +1,34 @@
 //define globals
-const sqlite3 = require('sqlite3').verbose();
 const client = require('discord-rich-presence')('493136625459527711');
 
-//take activityId and get information from manifest sqlite database
-function getActivityName(activityId, callback){
-	let db = new sqlite3.Database('./manifest.sqlite3');
-	let query = 'SELECT * FROM DestinyActivityDefinition, json_tree(DestinyActivityDefinition.json, "$") WHERE json_tree.key= "hash" and json_tree.value = ?;';
-	//orbit defintion doesnt work so we skip the lookup and manually set it
-	if(activityId == '82913930'){
-		callback('Orbit');
+var membershipId ="";
+
+
+function getActivityName(hash){
+	console.log("actName " + hash);
+	if(hash == "82913930"){
+		return "Orbit";
 	}
-	else{
-		db.get(query, [activityId], (err, row) => {
-	 		if (err) {
-	    		return console.error(err.message);
-	 	 	}
-	 		result = JSON.parse(row.json);
-	 		callback(result.displayProperties.name);
-	 	});
-		db.close();
-	}
+	var fs = require("fs");
+	var contents = fs.readFileSync('./manifest_defs/DestinyActivityDefinition.json'); 
+	var jman = JSON.parse(contents);
+	
+	return jman[hash].displayProperties.name;
 }
 
-function getActivityModeName(activityModeId, callback){
-	let db = new sqlite3.Database('./manifest.sqlite3');
-	let query = 'SELECT * FROM DestinyActivityModeDefinition, json_tree(DestinyActivityModeDefinition.json, "$") WHERE json_tree.key= "hash" and json_tree.value = ?;';
-	//orbit definition doesnt work so we skip the lookup and manually set it
-	if(activityModeId == '2166136261'){
-		callback('');
+function getActivityModeName(hash){
+	console.log("actModeName: " + hash);
+	if(hash == "2166136261"){
+		return "";
 	}
-	else{
-		db.get(query, [activityModeId], (err, row) => {
-	 		if (err) {
-	    		return console.error(err.message);
-	 	 	}
-	 		result = JSON.parse(row.json);
-	 		callback(result.displayProperties.name);
-	 	});
-		db.close();
-	}	
+	var fs = require("fs");
+	var contents = fs.readFileSync('./manifest_defs/DestinyActivityModeDefinition.json'); 
+	var jman = JSON.parse(contents);
+	
+	return jman[hash].displayProperties.name;
 }
 
-
+//getActivityModeName();
 
 //makes discord show the rich presence 	
 function updateStatus(inState, inDetails){
@@ -64,7 +51,7 @@ function updateStatus(inState, inDetails){
 //test runs the program
 function testRun(){
 	
-	var cValues = readConfig();
+	cValues = readConfig();
 	//callback1
 	searchPlayer(cValues[1], cValues[0], function callback(error, response, body){
 		result = JSON.parse(body);
@@ -77,11 +64,7 @@ function testRun(){
 	   			result = JSON.parse(body);
 	   			//getdate test code
 	   			var charNum = currentCharacter(result);
-	   			//console.log(charNum);
-	   			//end of getdate test code
 	   			
-				//console.log(result.Response.characterActivities.data['2305843009300837896'].currentActivityHash);
-	   			//console.log(result.Response.characterActivities.data['2305843009300837896'].currentActivityModeHash);
 	   			var light = result.Response.characters.data[charNum].light;
 	   			var classNum = result.Response.characters.data[charNum].classType;
 	   			
@@ -100,16 +83,12 @@ function testRun(){
 	   			var playerInfo = playerClass + ' ' + light;
 
 	   			var arrResult = [result.Response.characterActivities.data[charNum].currentActivityHash, result.Response.characterActivities.data[charNum].currentActivityModeHash];
-	   			//console.log(arrResult);
-	   			//callback3
-	   				getActivityModeName(arrResult[1], function callback(ActModeName){
-	   					//callback4
-	   					getActivityName(arrResult[0], function callback(ActName){
-	   						console.log(ActModeName + ' ' + ActName + ' ' +light + ' ' + playerClass);
-	   						updateStatus(ActModeName + ' ' + ActName, light + ' ' + playerClass); 
-	   					});//4
-	   				});//3
-	   			}
+	   			
+	   			var ActModeName = getActivityModeName(arrResult[1]);
+	   			var ActName = getActivityName(arrResult[0]);
+	   			console.log(ActModeName + ' ' + ActName + ' ' +light + ' ' + playerClass);
+	   			updateStatus(ActModeName + ' ' + ActName, light + ' ' + playerClass); 
+	   		}
 		});//2
 	});//1
 
