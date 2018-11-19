@@ -73,6 +73,8 @@ function updateStatus(inState, inDetails){
 
 
 //reads the configuration file and sets variables
+//not longer being used
+/*
 function readConfig(){
 	var fs = require('fs');
 	var lines = [];
@@ -95,14 +97,15 @@ function readConfig(){
 		return values;
 	}
 }
+*/
 
 
 //Searches player by name and returns memebershipId
-function searchPlayer(playerName, number){
+function searchPlayer(playerName, platform){
 	//creating request object
 	var rp = require('request-promise');
 	var key = "bd47705b6cf646abb77dea7a070451ed";
-	
+	var number = platNametoNum(platform);
 	if(number== 1 || number== 2){
 		options = {
   			url: 'https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/' + number + '/' + playerName +'/',
@@ -130,10 +133,21 @@ function searchPlayer(playerName, number){
 	if(number != 1 && number !=2 && number !=4 ){
 		console.log("ERROR: Invalid membershipType in config.ini");
 	}
-
-
 } 	
 
+function platNametoNum(name){
+	var num = null;
+	if(name == "XBOX"){
+		num = 1;
+	}
+	if(name == "PSN"){
+		num = 2;
+	}
+	if(name == "PC"){
+		num = 4;
+	}
+	return num;
+}
 //gets player profile based on given membershpId
 //Profile has activity and activity mode information returned
 function searchProfile(membershipId){
@@ -197,7 +211,8 @@ module.exports.className = className;
 module.exports.getActivityName = getActivityName;
 module.exports.getActivityModeName = getActivityModeName;
 module.exports.updateStatus = updateStatus;
-module.exports.readConfig = readConfig;
+//module.exports.readConfig = readConfig;
 module.exports.searchPlayer = searchPlayer;
 module.exports.searchProfile = searchProfile;
 module.exports.currentCharacter = currentCharacter;
+
