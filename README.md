@@ -12,4 +12,4 @@ Step 2. Enter your gamertag
 
 ![Imgur3](https://i.imgur.com/UoWQe7k.png)
 
-The program will then start tracking your activities. It will print the most recent activities. 
+The program will then start tracking your activities. Updates will appear in the box to let you know what the program is showing on your discord. 
