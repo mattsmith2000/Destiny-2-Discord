@@ -17,8 +17,23 @@ function className(classNum){
 	return playerClass;
 }
 
+//Takes the input platform name and returns it's associated bungie API platform number. Platform number is used in the player profile lookup. 
+function platNametoNum(name){
+	var num = null;
+	if(name == "XBOX"){
+		num = 1;
+	}
+	if(name == "PSN"){
+		num = 2;
+	}
+	if(name == "PC"){
+		num = 4;
+	}
+	return num;
+}
+
 function getActivityName(hash){
-	var actName = "";
+	var activity = "";
 	//code for orbit. This hash is not in the manifest and will cause an error if looked up. 
 	if(hash == "82913930"){
 		return "Orbit";
@@ -27,38 +42,56 @@ function getActivityName(hash){
 		var fs = require("fs");
 		var contents = fs.readFileSync('./manifest_defs/DestinyActivityDefinition.json'); 
 		var jman = JSON.parse(contents);
-		actName= jman[hash].displayProperties.name;
+		//actName= jman[hash].displayProperties.name;
+		var actName= jman[hash];
+		var placeName = getPlaceName(actName.placeHash);
+		var typeName = getActivityTypeName(actName.activityTypeHash);
+		activity = typeName + ", " + placeName;
 	}
 	catch(err){
 		console.log("Error reading DestinyActivityDefinition.json");
-		actName = null;
+		activity = null;
 	}
 	finally{
-		return actName;
+		return activity;
 	}
 }
 
-function getActivityModeName(hash){
-	var actModeName = "";
-	//code for null activity. Will return and exit function without executing a lookup as doing so will cause an error. 
-	if(hash == "2166136261"){
-		return "";
-	}
+//Takes the input Place hash and returns the associated name
+function getPlaceName(hash){
+	var placeName = "";
 	try{
 		var fs = require("fs");
-		var contents = fs.readFileSync('./manifest_defs/DestinyActivityModeDefinition.json'); 
+		var contents = fs.readFileSync('./manifest_defs/DestinyPlaceDefinition.json'); 
 		var jman = JSON.parse(contents);
-		actModeName = jman[hash].displayProperties.name;
+		placeName = jman[hash].displayProperties.name;
 	}
 	catch(err){
-		console.log("Error reading DestinyActivityModeDefinition.json");
-		actModeName = null;
+		console.log("Error reading DestinyPlaceDefinition.json");
+		placeName = null;
 	}
 	finally{
-		return actModeName;
+		return placeName;
 	}
 }
 
+//Takes the input ActivityType hash and returns the associated name
+function getActivityTypeName(hash){
+	var typeName = "";
+	try{
+		var fs = require("fs");
+		var contents = fs.readFileSync('./manifest_defs/DestinyActivityTypeDefinition.json'); 
+		var jman = JSON.parse(contents);
+		typeName = jman[hash].displayProperties.name;
+	}
+	catch(err){
+		console.log("Error reading DestinyActivityTypeDefinition.json");
+		typeName = null;
+	}
+	finally{
+		return typeName;
+	}
+}
 
 //makes discord show the rich presence. after 30 seconds have passed, updateStatus calls testRun again.  	
 function updateStatus(inState, inDetails){
@@ -70,34 +103,6 @@ function updateStatus(inState, inDetails){
  
  	client.updatePresence(settings);	
 }
-
-
-//reads the configuration file and sets variables
-//not longer being used
-/*
-function readConfig(){
-	var fs = require('fs');
-	var lines = [];
-	var values = "";
-	try{
-		fs.readFileSync('./config.ini').toString().split('\n').forEach(function (line){
-			if(!line.includes("//")){
-				if(line.includes("membershipType:") || line.includes("displayName:")){
-					lines.push(line.replace('\r',''));
-				}
-			}
-		});
-		values = [lines[0].split(":")[1].trim(), lines[1].split(":")[1].trim()];
-	}
-	catch(err){
-		console.log("Error reading config.ini");
-		values = null;
-	}
-	finally{
-		return values;
-	}
-}
-*/
 
 
 //Searches player by name and returns memebershipId
@@ -131,23 +136,11 @@ function searchPlayer(playerName, platform){
 		return rp(options);
 	}
 	if(number != 1 && number !=2 && number !=4 ){
-		console.log("ERROR: Invalid membershipType in config.ini");
+		console.log("");
 	}
 } 	
 
-function platNametoNum(name){
-	var num = null;
-	if(name == "XBOX"){
-		num = 1;
-	}
-	if(name == "PSN"){
-		num = 2;
-	}
-	if(name == "PC"){
-		num = 4;
-	}
-	return num;
-}
+
 //gets player profile based on given membershpId
 //Profile has activity and activity mode information returned
 function searchProfile(membershipId){
@@ -209,10 +202,9 @@ function searchProfile(membershipId){
 ////EXPORTS
 module.exports.className = className;
 module.exports.getActivityName = getActivityName;
-module.exports.getActivityModeName = getActivityModeName;
 module.exports.updateStatus = updateStatus;
-//module.exports.readConfig = readConfig;
 module.exports.searchPlayer = searchPlayer;
 module.exports.searchProfile = searchProfile;
 module.exports.currentCharacter = currentCharacter;
-
+module.exports.getPlaceName = getPlaceName;
+module.exports.getActivityTypeName = getActivityTypeName;

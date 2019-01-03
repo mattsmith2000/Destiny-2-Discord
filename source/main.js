@@ -8,7 +8,6 @@ function testRun(){
 		promptInfo();
 	}
 	else{
-		//console.log("good loop");
 		getProfile();
 	}
 }
@@ -36,6 +35,7 @@ function getProfile(){
 	prom2.then(function(result){
 		//console.log(result);
 		//sends result to currentCharacter to get the characterId for the most recently played character
+		
 		var charNum = d2rp.currentCharacter(result);
 		if(result.Response.characterActivities.data[charNum].currentActivityHash ==0){
 	   		console.log("You are not signed in. Sign in then reopen program");	
@@ -48,10 +48,10 @@ function getProfile(){
 		   	var pClass = d2rp.className(classNum);
 		   	//get Activty Name and ACtivity Mode Name based upon data received in result
 			var ActName = d2rp.getActivityName(result.Response.characterActivities.data[charNum].currentActivityHash);
-		   	var ActModeName = d2rp.getActivityModeName(result.Response.characterActivities.data[charNum].currentActivityModeHash);
-		   	console.log(ActModeName + ' ' + ActName + ' ' +light + ' ' + pClass);
+			console.log(ActName, platform + ": " +light + ' ' + pClass);
 		   	//update discord 
-		   	d2rp.updateStatus(ActModeName + ' ' + ActName, platform + ": " +light + ' ' + pClass); 
+		   	d2rp.updateStatus(ActName, platform + ": " +light + ' ' + pClass); 
+		   	//updates status every 30 seconds
 		   	setTimeout(function(){
 		   		testRun();
 		   	}, 30000);
