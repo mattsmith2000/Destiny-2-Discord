@@ -24,7 +24,8 @@ function getMembership(name, platform){
 			getProfile();
 		})
 		.catch(function(err){
-			console.log("ERROR: Could not retreive your profile from Bungie API. Double check your inputs then restart program");
+			console.log("\n---------------------------------------------------------------------------------\nERROR: Could not retreive your profile from Bungie API. Double check your inputs.\n---------------------------------------------------------------------------------");
+			promptInfo();
 		});
 	}
 }
@@ -38,7 +39,8 @@ function getProfile(){
 		
 		var charNum = d2rp.currentCharacter(result);
 		if(result.Response.characterActivities.data[charNum].currentActivityHash ==0){
-	   		console.log("You are not signed in. Sign in then reopen program");	
+	   		console.log("\n---------------------------------------------------------------\nERROR: You are not signed in. Sign in then reinput information.\n---------------------------------------------------------------\n");	
+	   		promptInfo();
 		}  
 	   	else{
 			//using the number recieved, the values for the most recent character are taken from the result object and stored in variables
@@ -48,7 +50,7 @@ function getProfile(){
 		   	var pClass = d2rp.className(classNum);
 		   	//get Activty Name and ACtivity Mode Name based upon data received in result
 			var ActName = d2rp.getActivityName(result.Response.characterActivities.data[charNum].currentActivityHash);
-			console.log(ActName, platform + ": " +light + ' ' + pClass);
+			console.log(platform + ": " +light + ' ' + pClass, ActName);
 		   	//update discord 
 		   	d2rp.updateStatus(ActName, platform + ": " +light + ' ' + pClass); 
 		   	//updates status every 30 seconds
@@ -58,7 +60,7 @@ function getProfile(){
 	   }
 	})
 	.catch(function(err){
-		console.log("ERROR: Failed to contact Bungie API. Reopen program to try again");
+		console.log("ERROR: Failed to contact Bungie API. Close program and try again a bit later");
 
 	});
 }
