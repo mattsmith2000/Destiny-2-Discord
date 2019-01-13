@@ -2,7 +2,7 @@
 A Node JS application that creates Discord rich presence for Destiny 2.
 To get started open main.exe.
 
-![Imgur1](https://i.imgur.com/qVReTlS.png)
+![Imgur1](https://i.imgur.com/Nw7vAsz.png) 
 
 Step 1. Input what platform you play on
 
