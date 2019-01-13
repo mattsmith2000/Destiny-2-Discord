@@ -13,14 +13,12 @@ function testRun(){
 }
 testRun();
 
-
-
-function getMembership(name, platform){
+function getMembership(name){
 	var prom1 = d2rp.searchPlayer(name, platform);
 	if(prom1 != null){
 		prom1.then(function(result){
 			membership = result.Response['0'].membershipId;
-			//ones membership is aquired, getProfile is called
+			//once membership is aquired, getProfile is called
 			getProfile();
 		})
 		.catch(function(err){
@@ -32,11 +30,9 @@ function getMembership(name, platform){
 
 
 function getProfile(){
-	var prom2 = d2rp.searchProfile(membership);
+	var prom2 = d2rp.searchProfile(membership, platform);
 	prom2.then(function(result){
-		//console.log(result);
 		//sends result to currentCharacter to get the characterId for the most recently played character
-		
 		var charNum = d2rp.currentCharacter(result);
 		if(result.Response.characterActivities.data[charNum].currentActivityHash ==0){
 	   		console.log("\n---------------------------------------------------------------\nERROR: You are not signed in. Sign in then reinput information.\n---------------------------------------------------------------\n");	
@@ -61,17 +57,13 @@ function getProfile(){
 	})
 	.catch(function(err){
 		console.log("ERROR: Failed to contact Bungie API. Close program and try again a bit later");
-
 	});
 }
 
 function promptInfo(){
 	console.log("What platform are you on? \n   -PSN \n   -Xbox \n   -PC");
 	var prompt = require('prompt');
-	
-	
 	prompt.start();
-	 
 	prompt.get([{
 	    name: 'platform',
 	    type: 'string',
@@ -97,7 +89,7 @@ function promptInfo(){
     			}], function (err, result) {
 	   				var gamertag = result.gamertag;
 	   				//one prompt completes, it calls getMembership
-	   				getMembership(gamertag, platform);
+	   				getMembership(gamertag);
 				});
 
     		}
@@ -112,7 +104,7 @@ function promptInfo(){
     			}], function (err, result) {
 	   				var gamertag = result.gamertag;
 	   				//once prompt completes, it calls getMembership;
-	   				getMembership(gamertag, platform);
+	   				getMembership(gamertag);
 				});
     		}
   		});

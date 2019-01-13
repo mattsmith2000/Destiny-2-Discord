@@ -111,6 +111,7 @@ function searchPlayer(playerName, platform){
 	var rp = require('request-promise');
 	var key = "bd47705b6cf646abb77dea7a070451ed";
 	var number = platNametoNum(platform);
+	//console.log('https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/' + number + '/' + playerName +'/');
 	if(number== 1 || number== 2){
 		options = {
   			url: 'https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/' + number + '/' + playerName +'/',
@@ -143,11 +144,12 @@ function searchPlayer(playerName, platform){
 
 //gets player profile based on given membershpId
 //Profile has activity and activity mode information returned
-function searchProfile(membershipId){
+function searchProfile(membershipId, platform){
+	var number = platNametoNum(platform);
 	var rp = require('request-promise');
 	var key = "bd47705b6cf646abb77dea7a070451ed";
 	var options = {
-  		url: 'https://www.bungie.net/Platform/Destiny2/4/Profile/' + membershipId +'/?components=200,204',
+  		url: 'https://www.bungie.net/Platform/Destiny2/'+ number +'/Profile/' + membershipId +'/?components=200,204',
   		headers: {
    			'X-API-Key': key,
    			'User-Agent': 'Request-Promise'
