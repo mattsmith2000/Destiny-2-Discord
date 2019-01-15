@@ -5,7 +5,19 @@ var platform;
 //test runs the program
 function testRun(){
 	if(membership == null){
-		promptInfo();
+		console.log("Checking for updates...");
+		d2rp.updateManifest(function callback(updateTime){
+			if(updateTime != ""){
+				d2rp.saveUpdateTime(updateTime, function callback2(){
+					promptInfo();
+				});
+			}
+			else{
+				promptInfo();
+			}
+			
+		});
+		
 	}
 	else{
 		getProfile();

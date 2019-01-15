@@ -1,6 +1,64 @@
 //define globals
 const client = require('discord-rich-presence')('493136625459527711');
 
+function updateManifest(callback){
+	var webDate = "";
+	//step 1: read file for last time manifest was updated
+	var http = require('https');
+	var fs = require("fs");
+	var contents = fs.readFileSync('./manifest_defs/lastUpdated.json'); 
+	var jman = JSON.parse(contents);
+	var myDate = jman.lastUpdated;
+	//console.log(jman.lastUpdated);
+  	//step 2: check the web page to see the last time it was updated
+  	const rp = require('request-promise');
+	const url = 'https://destiny.plumbing/';
+	rp(url)
+  	.then(function(html){
+    	var content = JSON.parse(html);
+    	webDate = content.lastUpdated;
+    	//console.log(content.lastUpdated);
+
+    	//Step 3: Check difference in dates
+		if(webDate>myDate){
+	 		console.log("Updating...");
+	 		var file1 = fs.createWriteStream("./manifest_defs/DestinyActivityDefinition.json");
+			var request1 = http.get("https://destiny.plumbing/en/raw/DestinyActivityDefinition.json", function(response1) {
+			  	response1.pipe(file1);
+			  	var file2 = fs.createWriteStream("./manifest_defs/DestinyActivityTypeDefinition.json");
+			 	var request2 = http.get("https://destiny.plumbing/en/raw/DestinyActivityTypeDefinition.json", function(response2) {
+			 		response2.pipe(file2);
+					var file3 = fs.createWriteStream("./manifest_defs/DestinyPlaceDefinition.json");
+					var request3 = http.get("https://destiny.plumbing/en/raw/DestinyPlaceDefinition.json", function(response3) {
+			  			response3.pipe(file3);
+						callback(webDate);
+					});
+				});
+			});
+	 	}
+	 	else{
+	 		webDate = "";
+	 		console.log("No updates\n");
+	 		callback(webDate);
+	 	}
+	})
+  	.catch(function(err){
+    	console.log("Error while checking for updates");
+    });
+}
+
+function saveUpdateTime(time, callback){
+	const fs = require('fs');
+	fs.writeFile("./manifest_defs/lastUpdated.json", '{"lastUpdated": "' +time +'"}', function(err) {
+    	if(err){
+        	return console.log(err);
+   	 	}	
+	console.log("Update Complete\n");
+	callback();
+	}); 
+}
+
+
 function className(classNum){
 	var playerClass = "";
 	switch(classNum){
@@ -46,7 +104,13 @@ function getActivityName(hash){
 		var actName= jman[hash];
 		var placeName = getPlaceName(actName.placeHash);
 		var typeName = getActivityTypeName(actName.activityTypeHash);
-		activity = typeName + ", " + placeName;
+		//check to see if place and type have the same name, if so only typeName is set
+		if(placeName == typeName){
+			activity = placeName;
+		}
+		else{
+			activity = typeName + ", " + placeName;
+		}
 	}
 	catch(err){
 		console.log("Error reading DestinyActivityDefinition.json");
@@ -210,3 +274,5 @@ module.exports.searchProfile = searchProfile;
 module.exports.currentCharacter = currentCharacter;
 module.exports.getPlaceName = getPlaceName;
 module.exports.getActivityTypeName = getActivityTypeName;
+module.exports.updateManifest =  updateManifest;
+module.exports.saveUpdateTime = saveUpdateTime;
