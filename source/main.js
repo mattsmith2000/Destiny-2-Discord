@@ -9,21 +9,29 @@ function testRun(){
 		d2rp.updateManifest(function callback(updateTime){
 			if(updateTime != ""){
 				d2rp.saveUpdateTime(updateTime, function callback2(){
-					promptInfo();
+					checkForSaved();
 				});
 			}
 			else{
-				promptInfo();
+				checkForSaved();
 			}
-			
 		});
-		
 	}
 	else{
 		getProfile();
 	}
 }
 testRun();
+
+function checkForSaved(){
+	var isThereInfo = d2rp.getAccountInfo();
+	if(isThereInfo[0] == true){
+		promptSaved();
+	}
+	else{
+		promptInfo();
+	}
+}
 
 function getMembership(name){
 	var prom1 = d2rp.searchPlayer(name, platform);
@@ -32,6 +40,8 @@ function getMembership(name){
 			membership = result.Response['0'].membershipId;
 			//once membership is aquired, getProfile is called
 			getProfile();
+			//user account settings are saved
+			d2rp.saveAccountInfo(platform, membership);
 		})
 		.catch(function(err){
 			console.log("\n---------------------------------------------------------------------------------\nERROR: Could not retreive your profile from Bungie API. Double check your inputs.\n---------------------------------------------------------------------------------");
@@ -71,6 +81,33 @@ function getProfile(){
 		console.log("ERROR: Failed to contact Bungie API. Close program and try again a bit later");
 	});
 }
+
+function promptSaved(){
+	console.log("Use same info as last time?(y/n)");
+	var prompt = require('prompt');
+	prompt.start();
+	prompt.get([{
+	    name: 'sameInfo',
+	    type: 'string',
+	    required: true,
+	    message: 'Please enter yes or no',
+  	 	conform: function(input) {
+      		var lcInput = input.toLowerCase();
+      		return (lcInput== 'y' || lcInput == 'n' || lcInput == 'yes' || lcInput =='no');
+    	}
+  	}], function(err, results) {
+  		if(results.sameInfo.toUpperCase() == 'Y' || results.sameInfo.toUpperCase() == 'YES'){
+  			var json = d2rp.getAccountInfo();
+			membership = json[1].membership;
+  			platform = json[1].platform;
+  			getProfile();
+  		}
+  		else{
+  			promptInfo();
+  		}
+  	});
+}
+
 
 function promptInfo(){
 	console.log("What platform are you on? \n   -PSN \n   -Xbox \n   -PC");

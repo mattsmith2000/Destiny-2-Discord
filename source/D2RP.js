@@ -58,6 +58,37 @@ function saveUpdateTime(time, callback){
 	}); 
 }
 
+function saveAccountInfo(platform, membership){
+	const fs = require('fs');
+	try{
+		fs.writeFile("./manifest_defs/account.json", '{"platform": "' + platform+'", "membership": "' + membership+'"}', function(err) {
+	    	if(err){
+	        	return console.log(err);
+	   	 	}	
+		});
+	}
+	catch(err){
+		console.log("Error saving account info");
+	} 
+}
+
+function getAccountInfo(){
+	const fs = require('fs');
+	try{
+		var contents = fs.readFileSync('./manifest_defs/account.json'); 
+		var json = JSON.parse(contents);
+		
+		if(json.platform == ""){
+			return [false, json];
+		}
+		else{
+			return [true, json];
+		}
+	}
+	catch(err){
+		console.log("Error loading account info");
+	}
+}
 
 function className(classNum){
 	var playerClass = "";
@@ -276,3 +307,5 @@ module.exports.getPlaceName = getPlaceName;
 module.exports.getActivityTypeName = getActivityTypeName;
 module.exports.updateManifest =  updateManifest;
 module.exports.saveUpdateTime = saveUpdateTime;
+module.exports.saveAccountInfo = saveAccountInfo;
+module.exports.getAccountInfo = getAccountInfo;
