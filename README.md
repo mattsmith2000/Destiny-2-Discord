@@ -1,6 +1,7 @@
 # Destiny-2-Rich-Presence
 A Node JS application that creates Discord rich presence for Destiny 2.
-To get started open main.exe.
+To properly use this program you must have Discord open and a Destiny 2 account. 
+Open main.exe to get started.
 
 ![Imgur1](https://i.imgur.com/wW4hXfU.png) 
 
